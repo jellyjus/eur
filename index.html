@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css?family=Lato:900" rel="stylesheet">
+    <title>Euro rates</title>
+    <style>
+        body, html{
+            height: 100%;
+        }
+
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            font-family: 'Lato';
+            font-weight: 900;
+            color: #353535;
+            position: relative;
+        }
+
+        .text{
+            display: inline-block;
+            font-size: 30vmin;
+            line-height: 1.205;
+            margin-top: 10%;
+        }
+
+        .text__first, .text__second{
+            position: relative;
+        }
+
+        .text__word{
+            opacity: 0;
+        }
+
+        .text__first-bg, .text__second-bg{
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            transform-origin: left;
+            transform: scaleX(0);
+        }
+
+        .text__first-bg{
+            background-color: #5fbff9;
+        }
+
+        .text__second-bg{
+            background-color: #f06543;
+        }
+
+        .text__second{
+            margin-left: 15vmin;
+        }
+
+        .small {
+            font-size: 6vmin;
+            color: #959595;
+        }
+
+        .restart{
+            position: absolute;
+            font-size: 12px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            border: none;
+            border-bottom: 1px dotted grey;
+            padding: 0;
+            margin: 0 auto 2%;
+            cursor: pointer;
+            color: grey;
+        }
+    </style>
+</head>
+<body>
+<p class="text">
+    <span class="text__first">
+        <span class="text__word">EUR </span>
+        <span class="text__first-bg"></span>
+    </span>
+    <br/>
+    <span class="text__second">
+        <span class="text__word small">SELL</span>
+        <span class="text__word" id="value">11</span>
+        <span class="text__second-bg"></span>
+    </span>
+</p>
+<button class="restart">reload</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/TweenMax.min.js"></script>
+<script>
+    // envelope animation
+    window.onload = function(){
+        var tl = new TimelineLite({delay: 1}),
+            firstBg = document.querySelectorAll('.text__first-bg'),
+            secBg = document.querySelectorAll('.text__second-bg'),
+            word  = document.querySelectorAll('.text__word');
+
+        tl
+            .to(firstBg, 0.2, {scaleX:1})
+            .to(secBg, 0.2, {scaleX:1})
+            .to(word, 0.1, {opacity:1}, "-=0.1")
+            .to(firstBg, 0.2, {scaleX:0})
+            .to(secBg, 0.2, {scaleX:0});
+
+        document.querySelector('.restart').onclick = load;
+        load();
+        setInterval(load, 10000);
+
+        async function load() {
+            const res = (await (await fetch('https://www.tinkoff.ru/api/v1/currency_rates')).json());
+            const value = res.payload.rates.find(el => el.category === "DebitCardsTransfers" && el.fromCurrency.name === "EUR" && el.toCurrency.name === "RUB");
+
+            if (!value || !value.buy)
+                return;
+
+            tl.restart();
+            document.getElementById('value').innerText = value.buy;
+        }
+    }
+</script>
+</body>
+</html>
