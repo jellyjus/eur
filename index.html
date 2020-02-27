@@ -64,6 +64,11 @@
             color: #959595;
         }
 
+        #icon {
+            width: 10vmin;
+            display: none;
+        }
+
         .restart{
             position: absolute;
             font-size: 12px;
@@ -89,7 +94,9 @@
     <br/>
     <span class="text__second">
         <span class="text__word small">SELL</span>
-        <span class="text__word" id="value">11</span>
+        <span class="text__word" id="value"></span>
+        <object type="image/svg+xml" data="arrow.svg" class="text__word" id="icon"></object>
+        <span class="text__word" style="font-size: 5vmin" id="oldValue"></span>
         <span class="text__second-bg"></span>
     </span>
 </p>
@@ -99,6 +106,8 @@
 <script>
     // envelope animation
     window.onload = function(){
+        var icon = document.getElementById('icon');
+        var value, oldValue;
         var tl = new TimelineLite({delay: 1}),
             firstBg = document.querySelectorAll('.text__first-bg'),
             secBg = document.querySelectorAll('.text__second-bg'),
@@ -116,14 +125,31 @@
         setInterval(load, 10000);
 
         async function load() {
-            const res = (await (await fetch('https://www.tinkoff.ru/api/v1/currency_rates')).json());
-            const value = res.payload.rates.find(el => el.category === "DebitCardsTransfers" && el.fromCurrency.name === "EUR" && el.toCurrency.name === "RUB");
+            const res = (await (await fetch('https://www.tinkoff.ru/api/v1/currency_rates')).json())
+                .payload.rates.find(el => el.category === "DebitCardsTransfers" && el.fromCurrency.name === "EUR" && el.toCurrency.name === "RUB");
 
-            if (!value || !value.buy)
+            if (!res || !res.buy)
                 return;
 
+            oldValue = value;
+            value = res.buy;
+
             tl.restart();
-            document.getElementById('value').innerText = value.buy;
+            document.getElementById('value').innerText = value;
+            if (oldValue) {
+                if (oldValue > value) {
+                    icon.style.display = 'inline-block';
+                    icon.style.filter = 'invert(0.4) sepia(1) saturate(20) hue-rotate(334.8deg) brightness(1.18)';
+                    document.getElementById('oldValue').innerText = oldValue;
+                    document.getElementById('oldValue').style.color = '#fc6848';
+                } else if (oldValue < value) {
+                    icon.style.display = 'inline-block';
+                    icon.style.filter = 'invert(0.38) sepia(1) saturate(9.9) hue-rotate(75.6deg) brightness(1)';
+                    icon.style.transform = `rotate(180deg)`;
+                    document.getElementById('oldValue').innerText = oldValue;
+                    document.getElementById('oldValue').style.color = '#34b400';
+                }
+            }
         }
     }
 </script>
