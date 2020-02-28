@@ -140,12 +140,13 @@
                 if (oldValue > value) {
                     icon.style.display = 'inline-block';
                     icon.style.filter = 'invert(0.4) sepia(1) saturate(20) hue-rotate(334.8deg) brightness(1.18)';
+                    icon.style.transform = 'rotate(0deg)';
                     document.getElementById('oldValue').innerText = oldValue;
                     document.getElementById('oldValue').style.color = '#fc6848';
                 } else if (oldValue < value) {
                     icon.style.display = 'inline-block';
                     icon.style.filter = 'invert(0.38) sepia(1) saturate(9.9) hue-rotate(75.6deg) brightness(1)';
-                    icon.style.transform = `rotate(180deg)`;
+                    icon.style.transform = 'rotate(180deg)';
                     document.getElementById('oldValue').innerText = oldValue;
                     document.getElementById('oldValue').style.color = '#34b400';
                 }
