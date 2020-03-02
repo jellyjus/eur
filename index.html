@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link href="https://fonts.googleapis.com/css?family=Lato:900" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
     <title>Euro rates</title>
     <style>
         body, html{
@@ -21,6 +22,8 @@
         }
 
         .text{
+            position: relative;
+            z-index: 2;
             display: inline-block;
             font-size: 30vmin;
             line-height: 1.205;
@@ -71,6 +74,7 @@
 
         .restart{
             position: absolute;
+            z-index: 3;
             font-size: 12px;
             bottom: 0;
             left: 0;
@@ -82,6 +86,13 @@
             margin: 0 auto 2%;
             cursor: pointer;
             color: grey;
+        }
+
+        .chart {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
         }
     </style>
 </head>
@@ -100,9 +111,11 @@
         <span class="text__second-bg"></span>
     </span>
 </p>
+<div class="chart"></div>
 <button class="restart">reload</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/TweenMax.min.js"></script>
+<script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
 <script>
     // envelope animation
     window.onload = function(){
@@ -120,9 +133,25 @@
             .to(firstBg, 0.2, {scaleX:0})
             .to(secBg, 0.2, {scaleX:0});
 
+        var chartData = {
+            labels: [],
+            series: [
+                []
+            ]
+        };
+        var chartTicker = 0;
+
         document.querySelector('.restart').onclick = load;
         load();
         setInterval(load, 10000);
+
+        var chart = new Chartist.Line('.chart', chartData, {
+            showArea: true,
+            fullWidth: true,
+            chartPadding: {
+                right: 40
+            }
+        });
 
         async function load() {
             const res = (await (await fetch('https://www.tinkoff.ru/api/v1/currency_rates')).json())
@@ -136,6 +165,17 @@
 
             tl.restart();
             document.getElementById('value').innerText = value;
+
+            chartTicker++;
+            if (chartTicker === 6) {
+                var date = new Date();
+                chartData.series[0].push(value);
+                chartData.labels.push(`${date.getHours()}:${date.getMinutes()}}`);
+                chart.update(chartData);
+                chartTicker = 0;
+            }
+
+
             if (oldValue) {
                 if (oldValue > value) {
                     icon.style.display = 'inline-block';
