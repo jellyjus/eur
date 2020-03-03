@@ -172,8 +172,8 @@
                 var date = new Date();
                 chartData.series[0].push(value);
                 chartData.labels.push(`${date.getHours()}:${date.getMinutes()}}`);
-                chartData.series[0].slice(-60);
-                chartData.labels.slice(-60);
+                chartData.series[0] = chartData.series[0].slice(-60);
+                chartData.labels = chartData.labels.slice(-60);
                 chart.update(chartData);
                 chartTicker = 0;
             }
