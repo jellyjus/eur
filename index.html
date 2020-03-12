@@ -154,41 +154,39 @@
 
         document.querySelector('.restart').onclick = load;
         load();
-        setInterval(load, 2000);
+        setInterval(load, 10000);
 
         var chart = new Chartist.Line('.chart', chartData, {
             showArea: true,
             fullWidth: true,
-            lineSmooth: Chartist.Interpolation.simple({
-                divisor: 2
-            }),
             chartPadding: {
                 right: 40
             }
         });
 
         async function load() {
-            const res = (await (await fetch('https://eur-currency.herokuapp.com/currency')).json());
+            const res = (await (await fetch('https://www.tinkoff.ru/api/v1/currency_rates')).json())
+                .payload.rates.find(el => el.category === "DebitCardsTransfers" && el.fromCurrency.name === "EUR" && el.toCurrency.name === "RUB");
 
-            if (!res || !res.rates)
+            if (!res || !res.buy)
                 return;
 
             oldValue = value;
-            value = +res.rates['EUR/RUB'].value;
+            value = res.buy;
 
             if (withAnim) tl.restart();
             document.getElementById('value').innerText = value.toFixed(2);
 
-            // chartTicker++;
-            // if (chartTicker === 6) {
+            chartTicker++;
+            if (chartTicker === 6) {
                 var date = new Date();
                 chartData.series[0].push(value);
                 chartData.labels.push(`${date.getHours()}:${date.getMinutes()}`);
-                chartData.series[0] = chartData.series[0].slice(-180);
-                chartData.labels = chartData.labels.slice(-180);
+                chartData.series[0] = chartData.series[0].slice(-60);
+                chartData.labels = chartData.labels.slice(-60);
                 chart.update(chartData);
-                // chartTicker = 0;
-            // }
+                chartTicker = 0;
+            }
 
 
             if (oldValue) {
