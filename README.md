@@ -1,3 +1,3 @@
 ### тОЛЬКО говнокод
 
-[![](https://memepedia.ru/wp-content/uploads/2019/04/rot-v-govne-orig.jpg)](https://memepedia.ru/wp-content/uploads/2019/04/rot-v-govne-orig.jpg)
+[![](https://sun9-29.userapi.com/c543109/v543109883/3a561/KhiYBRrLOHI.jpg)](https://sun9-29.userapi.com/c543109/v543109883/3a561/KhiYBRrLOHI.jpg)
